@@ -123,7 +123,10 @@ Walking_controller::Walking_controller(mc_rbdyn::RobotModulePtr rm,
   // solver().addConstraintSet(kinematicsConstraint);
   // solver().addConstraintSet(dynamicsConstraint);
 
-  footcontact_dof << 0, 0, 1, 0, 0, 0;
+  // sva ordering [wx, wy, wz, vx, vy, vz];
+  // FFDC needs only roll/pitch and z to be free but we can freeze vx/vy too
+  // to prevent horizontal sliding in the QP (while xy held softly)
+  footcontact_dof << 0, 0, 1, 1, 1, 0;  //1 = fixed, 0 = free.
   addContact({robot().name(), "ground", rightFootName_, "AllGround", 0.7, footcontact_dof});
   addContact({robot().name(), "ground", leftFootName_, "AllGround", 0.7, footcontact_dof});
 
@@ -725,6 +728,11 @@ void Walking_controller::MoveCoM()
   if(!doubleSupport_state && swing_foot_contact)
   {
     p_com.z() = controller_config_.stab_config.comHeight + robot().surfacePose(swingFootName).translation().z();
+  }
+  // Standing: hold the CoM HEIGHT captured at activation (besides x/y)
+  if(have_standing_com0_ && !Robot_Walking)
+  {
+    p_com.z() = standing_com0_.z();
   }
   Eigen::Vector3d Vc(mpc_state_.Get_CoMVel_planarTarget(mpc_state_.Index));
   Vc.z() = 0;

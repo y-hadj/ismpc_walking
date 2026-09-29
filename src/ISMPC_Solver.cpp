@@ -511,8 +511,15 @@ void ISMPC_Solver::Static_ZMP_Constraints()
   for(int i = 0; i < m_C; i++)
   {
 
-    sva::PTransformd X_0_step_stop =
-        sva::PTransformd(X_0_step_j.rotation(), (Rect_j.get_center() + Rect_jm1.get_center()) * 0.5);
+    Eigen::Vector3d ref_center = (Rect_j.get_center() + Rect_jm1.get_center()) * 0.5;
+    // The CL keeps whatever stable pose it starts in and does not drag the CoM
+    // back to the middle of the feet.
+    if(m_use_standing_ref_)
+    {
+      ref_center.x() = m_standing_ref_.x();
+      ref_center.y() = m_standing_ref_.y();
+    }
+    sva::PTransformd X_0_step_stop = sva::PTransformd(X_0_step_j.rotation(), ref_center);
 
     sva::PTransformd ZMP_Zone = X_0_step_stop;
 

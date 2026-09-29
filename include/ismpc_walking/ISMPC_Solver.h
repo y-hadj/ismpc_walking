@@ -313,6 +313,20 @@ public:
     m_delay = std::max(0., std::min(m_delta, t));
   }
 
+  // Hold the stable pose the MPC was activated in (use the captured CoM 
+  // as the ZMP/DCM ref instead of the geom foot-support center)
+  // PS. Only the reference is shifted; the ZMP
+  /// support constraint stays on the true foot polygon
+  void SetStandingReference(const Eigen::Vector3d & ref)
+  {
+    m_standing_ref_ = ref;
+    m_use_standing_ref_ = true;
+  }
+  void ClearStandingReference()
+  {
+    m_use_standing_ref_ = false;
+  }
+
   std::vector<Eigen::Vector3d> feasibility_region()
   {
     if(m_stop)
@@ -532,6 +546,8 @@ private:
   Eigen::Vector3d P_z_k = Eigen::Vector3d::Zero(); // Initial ZMP position
   Eigen::Vector3d P_z_k_delayed = Eigen::Vector3d::Zero(); // ZMP pose after input U_k during input delay
   Eigen::Vector3d P_c_k = Eigen::Vector3d::Zero(); // Initial CoM Position
+  Eigen::Vector3d m_standing_ref_ = Eigen::Vector3d::Zero(); // captured CoM to hold in standing (world frame)
+  bool m_use_standing_ref_ = false; // when true, standing ZMP/DCM ref = m_standing_ref_ instead of foot centre
   Eigen::Vector3d V_c_k = Eigen::Vector3d::Zero(); // Initial CoM Velocity
   Eigen::Vector3d P_u_k = Eigen::Vector3d::Zero(); // Initial Unstable Component/DCM
   Eigen::Vector3d U_k = Eigen::Vector3d::Zero(); // Current admittance acting on the pendulum (z_0 + u_0)

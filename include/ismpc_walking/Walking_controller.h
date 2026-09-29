@@ -435,6 +435,12 @@ protected:
       stabilizer_state_ = StabilizerState::None;
       active = true;
       debugMode = false;
+      // Capture the activation pose
+      Eigen::Vector3d com0 = realRobot().com();
+      standing_com0_ = com0;
+      have_standing_com0_ = true;
+      com0.head<2>() += stabTask->biasDCM();
+      MPCSolver.SetStandingReference(com0);
     }
   }
   void deactivate()
@@ -444,6 +450,8 @@ protected:
       stabTask->disable();
       // comTask->weight(0);
       active = false;
+      MPCSolver.ClearStandingReference();
+      have_standing_com0_ = false;
     }
   }
 
@@ -513,6 +521,10 @@ private:
   double z = 30; // Coordinate for a specified footstep position
 
   bool active = false; // MPC stabilization on or not
+  // CoM (world) captured at activation; while standing, MoveCoM holds its z as
+  // the CoM height target so Active does not re-posture the legs.
+  Eigen::Vector3d standing_com0_ = Eigen::Vector3d::Zero();
+  bool have_standing_com0_ = false;
   bool UseRealRobot = true; // To use the real robots data
   bool UseMPCState = false;
   bool UseStepRecovery = false;
