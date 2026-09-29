@@ -1,0 +1,95 @@
+# Unitree G1 + 2x BrainCo Revo2 hands
+
+ismpc:
+  u_cstr_square: [10, 10]
+  zmp_cstr_square: [0.14, 0.04]
+  zmp_cstr_square_static: [0.14, 0.04]
+  zmp_ref_offset: [0.0, 0.0]
+  offset: [0.0, 0.0]
+  offset_static: [0.0, 0.0]
+  next_stp_cstr_ratio: 1
+  lambda: 8
+  lambda_dbl_supp: 8
+  zmp_delay: 0.025
+  beta_dcm_static: 200
+  with_external_disturbance_highpass_filter: false
+  external_disturbance_cutoff_frequency: 1.0
+  feet_distance: 0.237
+
+footsteps_planner:
+  feet_distance: 0.237
+
+walking_controller:
+  footstep_height: 0.04
+  torsoBodyName: "torso_link"
+  leftFootLink: "left_ankle_roll_link"
+  rightFootLink: "right_ankle_roll_link"
+  left_foot_surface: "LeftFootCenter"
+  right_foot_surface: "RightFootCenter"
+  left_hand_surface: "LeftPalm"
+  right_hand_surface: "RightPalm"
+
+stabilizer:
+  dcm_tracking:
+    gains:
+      prop: [0, 0]
+      integral: [0, 0]
+      deriv: [0., 0.]
+      comdError: 0.
+  admittance:
+    copFzLambda: [40, 40, 40]
+    copFzDelay: 0.0
+    df: [0.000, 0.000, 0.0004]
+    cop: [0.02, 0.02]
+    maxVel:
+      angular: [3., 3., 3.]
+      linear: [1., 1., 1.]
+  tasks:
+    contact:
+      constrainCoP: false
+      damping: 150.
+    com:
+      stiffness: [100., 100., 100.]
+      dimWeight: [1, 1, 1]
+      weight: 1000.
+  dcm_bias:
+    dcmMeasureErrorStd: 0.001
+    biasDriftPerSecondStd: 0.0001
+    zmpMeasureErrorStd: 0.0005
+    comBiasLimit: [0.1, 0.1]
+    biasLimit: [0.05, 0.02]
+    withDCMBias: false  # bad with no F/T sensors (observer case)
+    correctCoMPos: false
+  external_wrench:
+    add_expected_com_offset: false
+    subtract_measured_value: false
+    subtract_target_value: false
+    exclude_from_dcm_bias_est: true
+    # com offset 
+    modify_com_error: false
+    modify_zmp_error: false
+    modify_zmp_error_d: false
+    com_offset_err_com_limit: 0.05
+    com_offset_err_zmp_limit: 0.05
+    # filter
+    ext_wrench_sum_cutoff: 0.05
+    com_offset_cutoff: 0.05
+    com_offset_com_cutoff: 10.0
+    derivator_time_constant: 1.0
+    # gain (not loaded automatically)
+    ext_wrench_gain: [1, 1, 1]
+  vdc:
+    stiffness: 10
+
+stabilizer_sgsupp:
+  admittance:
+    cop: [0.02, 0.02] # not tested in actual walking yet
+
+stabilizer_dblsupp:
+  admittance:
+    copFzLambda: [25, 25, 25]
+    df: [0.000, 0.000, 0.0004]
+    cop: [0.02, 0.02] # not tested in actual walking yet
+
+safety_tresholds:
+  MIN_DS_PRESSURE: 0

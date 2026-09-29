@@ -17,15 +17,16 @@ struct ControllerConfiguration
 
   Eigen::Vector2d Footsteps_Generation_Kinematics_cstr{0.3, 0.1};
 
+  // standing params (before SS/DS phases)
   double Beta_zmp_vel = 1;
   double Beta_step = 1e4; // 1e4;
   double Beta_stab = 1e7;
   double Beta_zmp_traj = 0.;
   double Beta_zmp_traj_static = 10;
   double Beta_Ld = 1.;
-  double Beta_dcm_static = 200;
+  double Beta_dcm_static = 50; 
   double Beta_dcm_vel = 0;
-  double Beta_dcm_vel_static = 0;
+  double Beta_dcm_vel_static = 2; 
   double Beta_dcm = 1;
   double lambda_ = 100.;
   double lambda_sg_supp = 100;
